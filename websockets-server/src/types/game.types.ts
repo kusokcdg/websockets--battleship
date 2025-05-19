@@ -1,59 +1,59 @@
-type CommonActionGame = "attack";
+export type CommonActionGame = "attack";
 
-type RequestActionGame =
+export type RequestActionGame =
   | CommonActionGame
   | "randomAttack"
   | "add_ships"
   | "start_game";
 
-type ResponseActionGame = CommonActionGame | "turn" | "finish";
+export type ResponseActionGame = CommonActionGame | "turn" | "finish";
 
-type DataRequestActionGame = DataAddShips | DataAttack;
+export type DataRequestActionGame = DataAddShips | DataAttack;
 
-type DataResponseActionGame =
+export type DataResponseActionGame =
   | DataStartGame
   | DataResponseAttack
   | DataTurn
   | DataFinish;
 
-type PositionShip = {
+export type PositionShip = {
   x: number;
   y: number;
 };
 
-type DataAddShips = {
+export type DataAddShips = {
   gameId: number | string;
   ships: Ship[];
   indexPlayer: number | string;
 }[];
 
-type DataStartGame = {
+export type DataStartGame = {
   ships: Ship[];
   currentPlayerIndex: number | string;
 };
 
-type Ship = {
+export type Ship = {
   position: PositionShip;
   direction: boolean;
   length: number;
   type: "small" | "medium" | "large" | "huge";
 };
 
-type DataAttack = {
+export type DataAttack = {
   gameId: number | string;
   indexPlayer: number | string;
 } & (PositionShip | null);
 
-type DataResponseAttack = {
+export type DataResponseAttack = {
   position: PositionShip;
   currentPlayer: number | string;
   status: "miss" | "killed" | "shot";
 };
 
-type DataTurn = {
+export type DataTurn = {
   currentPlayer: number | string;
 };
 
-type DataFinish = {
+export type DataFinish = {
   winPlayer: number | string;
 };

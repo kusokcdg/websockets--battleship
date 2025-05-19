@@ -1,48 +1,48 @@
-type CommonSession = "reg";
+export type CommonSession = "reg";
 
-type RequestSession = CommonSession | "create_room" | "add_user_to_room";
+export type RequestSession = CommonSession | "create_room" | "add_user_to_room";
 
-type ResponseSession =
+export type ResponseSession =
   | CommonSession
   | "update_winners"
   | "create_game"
   | "update_room";
 
-type DataRequestSession = DataRegister | DataAddUser | string;
+export type DataRequestSession = DataRegister | DataAddUser | string;
 
-type DataResponsesSession =
+export type DataResponsesSession =
   | DataResponseRegister
   | DataWinners
   | DataCreateGame
   | DataStateRoom;
 
-type DataRegister = {
+export type DataRegister = {
   name: string;
   password: string;
 };
 
-type DataResponseRegister = {
+export type DataResponseRegister = {
   name: string;
   index: number | string;
   error: boolean;
   errorText: string;
 };
 
-type DataWinners = {
+export type DataWinners = {
   name: string;
   wins: number;
 }[];
 
-type DataAddUser = {
+export type DataAddUser = {
   indexRoom: number | string;
 };
 
-type DataCreateGame = {
+export type DataCreateGame = {
   idGame: number | string;
   idPlayer: number | string;
 };
 
-type DataStateRoom = {
+export type DataStateRoom = {
   roomId: number | string;
   roomUsers: {
     name: string;
