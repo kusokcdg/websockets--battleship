@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only --env-file=.env.example  src/index.ts",
+    "start": "ts-node  src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -21,6 +22,7 @@
   "dependencies": {
     "@types/ws": "^8.18.1",
     "cross-env": "^7.0.3",
+    "ts-node": "^10.9.2",
     "ws": "^8.18.2"
   }
 }
