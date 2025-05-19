@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { stringifyWebSocketResponse } from "../utils";
 
 import { sockets, users } from "../env";
-import { MessageApp, UserEntry } from "../types/types";
+import { Winner, MessageApp, UserEntry } from "../types/types";
 
 import type {
   DataRegister,
@@ -22,24 +22,21 @@ export const handleRegister = (
     id: 0
   };
   ws.send(stringifyWebSocketResponse(responseRegister), { binary: false });
-  if (!resultRegister.error) {
-    type Winner = {
-      name: string;
-      wins: number;
-    };
-    const winners: Winner[] = users
-      .filter((user) => user.wins >= 0)
-      .map(({ player, wins }) => ({
-        name: player.name,
-        wins
-      }));
-    const responseWinners: MessageApp<"update_winners", DataWinners> = {
-      type: "update_winners",
-      data: winners,
-      id: 0
-    };
-    ws.send(stringifyWebSocketResponse(responseWinners), { binary: false });
-  }
+
+  if (resultRegister.error) return;
+
+  const winners: Winner[] = users
+    .filter((user) => user.wins >= 0)
+    .map(({ player, wins }) => ({
+      name: player.name,
+      wins
+    }));
+  const responseWinners: MessageApp<"update_winners", DataWinners> = {
+    type: "update_winners",
+    data: winners,
+    id: 0
+  };
+  ws.send(stringifyWebSocketResponse(responseWinners), { binary: false });
 };
 
 export const registerUser = (

@@ -28,10 +28,12 @@ export type DataResponseRegister = {
   errorText: string;
 };
 
-export type DataWinners = {
+export type Winner = {
   name: string;
   wins: number;
-}[];
+};
+
+export type DataWinners = Winner[];
 
 export type DataAddUser = {
   indexRoom: number | string;
