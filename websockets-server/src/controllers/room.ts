@@ -16,7 +16,7 @@ export const handleCreateRoom = (ws: WebSocket): void => {
   const findedUser = users.find((u) => u.idUser === findedWS?.idUser);
 
   if (!isDefined<UserEntry>(findedUser)) return;
-
+  console.log("Created room.");
   rooms.push({
     id: randomUUID(),
     players: [{ name: findedUser.player.name, index: findedUser.idUser }]
@@ -34,6 +34,7 @@ export const updateRooms = (ws: WebSocket): void => {
     })),
     id: 0
   };
+  console.log("Added room.");
   ws.send(stringifyWebSocketResponse(responseRooms), { binary: false });
 };
 
@@ -45,6 +46,7 @@ export const handleAddUser = (
   const findedUser = users.find((u) => u.idUser === findedWS?.idUser);
 
   if (!isDefined<UserEntry>(findedUser)) return null;
+  console.log("Added in room.");
   rooms
     .find((room) => room.id === res.data.indexRoom)
     ?.players.push({ name: findedUser.player.name, index: findedUser.idUser });

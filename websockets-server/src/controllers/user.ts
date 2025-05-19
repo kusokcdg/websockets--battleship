@@ -16,6 +16,7 @@ export const handleRegister = (
   ws: WebSocket,
   res: MessageApp<"reg", DataRegister>
 ): void => {
+  console.log("Check login!");
   const resultRegister: DataResponseRegister = registerUser(ws, res.data);
   const responseRegister: MessageApp<"reg", DataResponseRegister> = {
     type: "reg",
@@ -25,6 +26,7 @@ export const handleRegister = (
   ws.send(stringifyWebSocketResponse(responseRegister), { binary: false });
 
   if (resultRegister.error) return;
+  console.log("Register success!");
   updateRooms(ws);
   updateWinners(ws);
 };
@@ -34,12 +36,11 @@ export const registerUser = (
   data: DataRegister
 ): DataResponseRegister => {
   const existedUser: UserEntry | undefined = users.find(
-    (user) =>
-      user.player.name === data.name && user.player.password === data.password
+    (user) => user.player.name === data.name
   );
 
   if (existedUser) {
-    console.log("false");
+    console.log("Cant login.");
     return {
       name: data.name,
       index: "",

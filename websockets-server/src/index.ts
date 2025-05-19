@@ -23,6 +23,7 @@ import {
   updateRooms
 } from "./controllers/room";
 import { createGame, handleAddShips } from "./controllers/game";
+import { sockets } from "./env";
 
 const PORT: number = parseInt(process.env.PORT!) || 3000;
 const wss: WebSocketServer = new WebSocketServer({ port: PORT });
@@ -33,6 +34,13 @@ wss.on("listening", () =>
 
 wss.on("connection", (ws, req) => {
   ws.on("error", console.error);
+
+  ws.on("close", () => {
+    console.log("Client disconnected");
+    const index = sockets.findIndex((s) => s.ws === ws);
+    if (index !== -1) sockets.splice(index, 1);
+  });
+
   ws.on("message", (data) => {
     const res: MessageApp<
       RequestSession | RequestActionGame,

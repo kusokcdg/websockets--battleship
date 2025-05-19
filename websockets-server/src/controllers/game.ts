@@ -44,6 +44,7 @@ export const createGame = (idRoom: string | number | null): void => {
   socket2?.ws.send(stringifyWebSocketResponse(resCreateGame2), {
     binary: false
   });
+  console.log("Create game.");
 };
 
 export const handleAddShips = (
@@ -78,5 +79,6 @@ export const handleAddShips = (
       id: 0
     };
     socket2?.ws.send(stringifyWebSocketResponse(resStartGame2));
+    console.log("Added ships.");
   }
 };
