@@ -1,30 +1,19 @@
 import { WebSocketServer } from "ws";
-import { parseWebSocketRequest, stringifyWebSocketResponse } from "./utils";
-import { randomUUID } from "node:crypto";
+import { parseWebSocketRequest } from "./utils";
+import "./env";
+
+import { handleRegister } from "./controllers/user";
+import { isRegisterType } from "./guards";
+
+import {
+  DataRequestActionGame,
+  DataRequestSession,
+  MessageApp,
+  RequestActionGame,
+  RequestSession
+} from "./types/types";
 
 const PORT: number = parseInt(process.env.PORT!) || 3000;
-
-const ex: MessageApp<ResponseSession, DataResponsesSession> = {
-  type: "reg",
-  data: {
-    name: "test-name",
-    index: randomUUID(),
-    error: false,
-    errorText: ""
-  },
-  id: 0
-};
-const winners: MessageApp<ResponseSession, DataWinners> = {
-  type: "update_winners",
-  data: [
-    {
-      name: "string",
-      wins: 4
-    }
-  ],
-  id: 0
-};
-
 const wss: WebSocketServer = new WebSocketServer({ port: PORT });
 
 wss.on("listening", () =>
@@ -34,10 +23,14 @@ wss.on("listening", () =>
 wss.on("connection", (ws, req) => {
   ws.on("error", console.error);
   ws.on("message", (data) => {
-    const res = parseWebSocketRequest(data);
-    console.dir(res);
-    ws.send(stringifyWebSocketResponse(ex), { binary: false });
-    ws.send(stringifyWebSocketResponse(winners), { binary: false });
+    const res: MessageApp<
+      RequestSession | RequestActionGame,
+      DataRequestSession | DataRequestActionGame
+    > = parseWebSocketRequest(data);
+
+    if (isRegisterType(res)) {
+      handleRegister(ws, res);
+    }
   });
   console.log(`Someone connected with ip: ${req.socket.remoteAddress}`);
 });

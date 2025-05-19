@@ -1,4 +1,15 @@
 import type { RawData } from "ws";
+import type {
+  DataRequestActionGame,
+  DataRequestSession,
+  DataResponseActionGame,
+  DataResponsesSession,
+  MessageApp,
+  RequestActionGame,
+  RequestSession,
+  ResponseActionGame,
+  ResponseSession
+} from "./types/types";
 
 export const parseWebSocketRequest = (
   raw: RawData
@@ -7,7 +18,7 @@ export const parseWebSocketRequest = (
   DataRequestSession | DataRequestActionGame
 > => {
   const request = JSON.parse(raw.toString("utf8"));
-  request.data = JSON.parse(request.data);
+  if (request.data) request.data = JSON.parse(request.data);
   return request;
 };
 

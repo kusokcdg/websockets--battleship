@@ -9,7 +9,8 @@ export type MessageApp<T, K> = {
 
 export type UserEntry = {
   idUser: string;
-  user: DataRegister;
+  player: DataRegister;
+  wins: number;
 };
 
 export type Users = UserEntry[];
