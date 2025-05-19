@@ -1,4 +1,5 @@
 import type {
+  DataAddShips,
   DataAddUser,
   DataRegister,
   DataRequestActionGame,
@@ -33,3 +34,10 @@ export const isAddUserType = (
   >
 ): msg is MessageApp<"add_user_to_room", DataAddUser> =>
   msg.type === "add_user_to_room";
+
+export const isAddShips = (
+  msg: MessageApp<
+    RequestSession | RequestActionGame,
+    DataRequestSession | DataRequestActionGame
+  >
+): msg is MessageApp<"add_ships", DataAddShips> => msg.type === "add_ships";

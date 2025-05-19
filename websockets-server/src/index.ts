@@ -3,7 +3,12 @@ import { parseWebSocketRequest } from "./utils";
 import "./env";
 
 import { handleRegister } from "./controllers/user";
-import { isAddUserType, isCreateRoomType, isRegisterType } from "./guards";
+import {
+  isAddShips,
+  isAddUserType,
+  isCreateRoomType,
+  isRegisterType
+} from "./guards";
 
 import {
   DataRequestActionGame,
@@ -17,7 +22,7 @@ import {
   handleCreateRoom,
   updateRooms
 } from "./controllers/room";
-import { createGame } from "./controllers/game";
+import { createGame, handleAddShips } from "./controllers/game";
 
 const PORT: number = parseInt(process.env.PORT!) || 3000;
 const wss: WebSocketServer = new WebSocketServer({ port: PORT });
@@ -46,6 +51,8 @@ wss.on("connection", (ws, req) => {
       wss.clients.forEach((client) => updateRooms(client));
       createGame(idRoom);
     }
+
+    if (isAddShips(res)) handleAddShips(res);
   });
   console.log(`Someone connected with ip: ${req.socket.remoteAddress}`);
 });

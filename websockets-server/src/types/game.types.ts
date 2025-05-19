@@ -1,12 +1,12 @@
 export type CommonActionGame = "attack";
 
-export type RequestActionGame =
-  | CommonActionGame
-  | "randomAttack"
-  | "add_ships"
-  | "start_game";
+export type RequestActionGame = CommonActionGame | "randomAttack" | "add_ships";
 
-export type ResponseActionGame = CommonActionGame | "turn" | "finish";
+export type ResponseActionGame =
+  | CommonActionGame
+  | "turn"
+  | "finish"
+  | "start_game";
 
 export type DataRequestActionGame = DataAddShips | DataAttack;
 
@@ -25,7 +25,7 @@ export type DataAddShips = {
   gameId: number | string;
   ships: Ship[];
   indexPlayer: number | string;
-}[];
+};
 
 export type DataStartGame = {
   ships: Ship[];
