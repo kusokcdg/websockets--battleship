@@ -3,13 +3,14 @@ import { randomUUID } from "node:crypto";
 import { stringifyWebSocketResponse } from "../utils";
 
 import { sockets, users } from "../env";
-import { Winner, MessageApp, UserEntry } from "../types/types";
+import type { Winner, MessageApp, UserEntry } from "../types/types";
 
 import type {
   DataRegister,
   DataResponseRegister,
   DataWinners
 } from "../types/session.types";
+import { updateRooms } from "./room";
 
 export const handleRegister = (
   ws: WebSocket,
@@ -24,19 +25,8 @@ export const handleRegister = (
   ws.send(stringifyWebSocketResponse(responseRegister), { binary: false });
 
   if (resultRegister.error) return;
-
-  const winners: Winner[] = users
-    .filter((user) => user.wins >= 0)
-    .map(({ player, wins }) => ({
-      name: player.name,
-      wins
-    }));
-  const responseWinners: MessageApp<"update_winners", DataWinners> = {
-    type: "update_winners",
-    data: winners,
-    id: 0
-  };
-  ws.send(stringifyWebSocketResponse(responseWinners), { binary: false });
+  updateRooms(ws);
+  updateWinners(ws);
 };
 
 export const registerUser = (
@@ -71,4 +61,19 @@ export const registerUser = (
     error: false,
     errorText: ""
   };
+};
+
+export const updateWinners = (ws: WebSocket): void => {
+  const winners: Winner[] = users
+    .filter((user) => user.wins >= 0)
+    .map(({ player, wins }) => ({
+      name: player.name,
+      wins
+    }));
+  const responseWinners: MessageApp<"update_winners", DataWinners> = {
+    type: "update_winners",
+    data: winners,
+    id: 0
+  };
+  ws.send(stringifyWebSocketResponse(responseWinners), { binary: false });
 };

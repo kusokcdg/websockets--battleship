@@ -3,7 +3,7 @@ import { parseWebSocketRequest } from "./utils";
 import "./env";
 
 import { handleRegister } from "./controllers/user";
-import { isRegisterType } from "./guards";
+import { isAddUserType, isCreateRoomType, isRegisterType } from "./guards";
 
 import {
   DataRequestActionGame,
@@ -12,6 +12,11 @@ import {
   RequestActionGame,
   RequestSession
 } from "./types/types";
+import {
+  handleAddUser,
+  handleCreateRoom,
+  updateRooms
+} from "./controllers/room";
 
 const PORT: number = parseInt(process.env.PORT!) || 3000;
 const wss: WebSocketServer = new WebSocketServer({ port: PORT });
@@ -28,8 +33,16 @@ wss.on("connection", (ws, req) => {
       DataRequestSession | DataRequestActionGame
     > = parseWebSocketRequest(data);
 
-    if (isRegisterType(res)) {
-      handleRegister(ws, res);
+    if (isRegisterType(res)) handleRegister(ws, res);
+
+    if (isCreateRoomType(res)) {
+      handleCreateRoom(ws);
+      wss.clients.forEach((client) => updateRooms(client));
+    }
+
+    if (isAddUserType(res)) {
+      handleAddUser(ws, res);
+      wss.clients.forEach((client) => updateRooms(client));
     }
   });
   console.log(`Someone connected with ip: ${req.socket.remoteAddress}`);

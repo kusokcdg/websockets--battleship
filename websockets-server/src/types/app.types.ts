@@ -7,6 +7,16 @@ export type MessageApp<T, K> = {
   id: number;
 };
 
+export type Room = {
+  id: number | string;
+  players: {
+    name: string;
+    index: number | string;
+  }[];
+};
+
+export type Rooms = Room[];
+
 export type UserEntry = {
   idUser: string;
   player: DataRegister;
