@@ -40,12 +40,13 @@ export const updateRooms = (ws: WebSocket): void => {
 export const handleAddUser = (
   ws: WebSocket,
   res: MessageApp<"add_user_to_room", DataAddUser>
-): void => {
+): string | number | null => {
   const findedWS = sockets.find((s) => s.ws === ws);
   const findedUser = users.find((u) => u.idUser === findedWS?.idUser);
 
-  if (!isDefined<UserEntry>(findedUser)) return;
+  if (!isDefined<UserEntry>(findedUser)) return null;
   rooms
     .find((room) => room.id === res.data.indexRoom)
     ?.players.push({ name: findedUser.player.name, index: findedUser.idUser });
+  return res.data.indexRoom;
 };

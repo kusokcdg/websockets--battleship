@@ -17,6 +17,7 @@ import {
   handleCreateRoom,
   updateRooms
 } from "./controllers/room";
+import { createGame } from "./controllers/game";
 
 const PORT: number = parseInt(process.env.PORT!) || 3000;
 const wss: WebSocketServer = new WebSocketServer({ port: PORT });
@@ -41,8 +42,9 @@ wss.on("connection", (ws, req) => {
     }
 
     if (isAddUserType(res)) {
-      handleAddUser(ws, res);
+      const idRoom = handleAddUser(ws, res);
       wss.clients.forEach((client) => updateRooms(client));
+      createGame(idRoom);
     }
   });
   console.log(`Someone connected with ip: ${req.socket.remoteAddress}`);
