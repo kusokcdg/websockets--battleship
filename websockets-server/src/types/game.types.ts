@@ -21,20 +21,14 @@ type PositionShip = {
   y: number;
 };
 
-type DataAddShips = [
-  {
-    roomId: number | string;
-    roomUsers: [
-      {
-        name: string;
-        index: number | string;
-      }
-    ];
-  }
-];
+type DataAddShips = {
+  gameId: number | string;
+  ships: Ship[];
+  indexPlayer: number | string;
+}[];
 
 type DataStartGame = {
-  ships: [Ship];
+  ships: Ship[];
   currentPlayerIndex: number | string;
 };
 

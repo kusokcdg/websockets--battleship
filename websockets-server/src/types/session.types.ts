@@ -28,12 +28,10 @@ type DataResponseRegister = {
   errorText: string;
 };
 
-type DataWinners = [
-  {
-    name: string;
-    wins: number;
-  }
-];
+type DataWinners = {
+  name: string;
+  wins: number;
+}[];
 
 type DataAddUser = {
   indexRoom: number | string;
@@ -44,14 +42,10 @@ type DataCreateGame = {
   idPlayer: number | string;
 };
 
-type DataStateRoom = [
-  {
-    roomId: number | string;
-    roomUsers: [
-      {
-        name: string;
-        index: number | string;
-      }
-    ];
-  }
-];
+type DataStateRoom = {
+  roomId: number | string;
+  roomUsers: {
+    name: string;
+    index: number | string;
+  }[];
+}[];
