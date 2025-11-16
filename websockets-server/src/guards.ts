@@ -1,6 +1,7 @@
 import type {
   DataAddShips,
   DataAddUser,
+  DataAttack,
   DataRegister,
   DataRequestActionGame,
   DataRequestSession,
@@ -41,3 +42,20 @@ export const isAddShips = (
     DataRequestSession | DataRequestActionGame
   >
 ): msg is MessageApp<"add_ships", DataAddShips> => msg.type === "add_ships";
+
+export const isAttackByPlayer = (
+  msg: MessageApp<
+    RequestSession | RequestActionGame,
+    DataRequestSession | DataRequestActionGame
+  >
+): msg is MessageApp<"attack", DataAttack> => msg.type === "attack";
+
+export const isAttack = (
+  msg: MessageApp<
+    RequestSession | RequestActionGame,
+    DataRequestSession | DataRequestActionGame
+  >
+): msg is MessageApp<
+  "attack" | "randomAttack",
+  DataAttack | Omit<DataAttack, "PositionShip">
+> => msg.type === "attack" || msg.type === "randomAttack";

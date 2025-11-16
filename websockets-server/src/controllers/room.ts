@@ -16,7 +16,7 @@ export const handleCreateRoom = (ws: WebSocket): void => {
   const findedUser = users.find((u) => u.idUser === findedWS?.idUser);
 
   if (!isDefined<UserEntry>(findedUser)) return;
-  console.log("Created room.");
+  console.log("Created room and add yourself.");
   rooms.push({
     id: randomUUID(),
     players: [{ name: findedUser.player.name, index: findedUser.idUser }]
@@ -44,11 +44,14 @@ export const handleAddUser = (
 ): string | number | null => {
   const findedWS = sockets.find((s) => s.ws === ws);
   const findedUser = users.find((u) => u.idUser === findedWS?.idUser);
-
   if (!isDefined<UserEntry>(findedUser)) return null;
+  const findedRoom = rooms.find((room) => room.id === res.data.indexRoom);
+  if (findedRoom?.players.some((player) => player.index === findedUser.idUser))
+    return null;
   console.log("Added in room.");
-  rooms
-    .find((room) => room.id === res.data.indexRoom)
-    ?.players.push({ name: findedUser.player.name, index: findedUser.idUser });
+  findedRoom?.players.push({
+    name: findedUser.player.name,
+    index: findedUser.idUser
+  });
   return res.data.indexRoom;
 };

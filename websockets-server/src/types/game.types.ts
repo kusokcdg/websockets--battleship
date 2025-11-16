@@ -1,3 +1,5 @@
+import { NUMBER_BOARD } from "../controllers/utils";
+
 export type CommonActionGame = "attack";
 
 export type RequestActionGame = CommonActionGame | "randomAttack" | "add_ships";
@@ -57,3 +59,11 @@ export type DataTurn = {
 export type DataFinish = {
   winPlayer: number | string;
 };
+
+export interface RowBoard extends Array<0 | 1 | 2> {
+  length: typeof NUMBER_BOARD;
+}
+
+export interface Board extends Array<RowBoard> {
+  length: typeof NUMBER_BOARD;
+}

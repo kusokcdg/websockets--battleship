@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 import type { DataRegister } from "./session.types";
-import { Ship } from "./game.types";
+import { Board, Ship } from "./game.types";
 
 export type MessageApp<T, K> = {
   type: T;
@@ -15,11 +15,16 @@ export type Game = {
   player1: {
     id: number | string;
     data: Ship[] | null;
+    board: Board;
+    boardOpponent: Board;
   };
   player2: {
     id: number | string;
     data: Ship[] | null;
+    board: Board;
+    boardOpponent: Board;
   };
+  currentPlayer: Game["player1"]["id"] | null;
 };
 
 export type Room = {

@@ -4,8 +4,17 @@ import { randomUUID } from "node:crypto";
 import { stringifyWebSocketResponse } from "../utils";
 import { games, rooms, sockets } from "../env";
 import { DataCreateGame } from "../types/session.types";
-import { DataAddShips, DataStartGame, Game, MessageApp } from "../types/types";
-import { isDefined } from "../guards";
+import {
+  Board,
+  DataAddShips,
+  DataAttack,
+  DataResponseAttack,
+  DataStartGame,
+  DataTurn,
+  MessageApp,
+  PositionShip
+} from "../types/types";
+import { createBoard, fillBoard, getRandomPosition } from "./utils";
 
 export const createGame = (idRoom: string | number | null): void => {
   if (!idRoom) return;
@@ -17,12 +26,17 @@ export const createGame = (idRoom: string | number | null): void => {
     id: idGame,
     player1: {
       data: null,
-      id: player1.index
+      id: player1.index,
+      board: createBoard(),
+      boardOpponent: createBoard()
     },
     player2: {
       data: null,
-      id: player2.index
-    }
+      id: player2.index,
+      board: createBoard(),
+      boardOpponent: createBoard()
+    },
+    currentPlayer: null
   });
 
   const socket1 = sockets.find((s) => s.idUser === player1.index);
@@ -52,11 +66,19 @@ export const handleAddShips = (
 ): void => {
   const findedGame = games.find((game) => game.id === res.data.gameId);
   if (!findedGame) return;
-  if (findedGame.player1.id === res.data.indexPlayer)
+  if (findedGame.player1.id === res.data.indexPlayer) {
     findedGame.player1.data = res.data.ships;
-
-  if (findedGame.player2.id === res.data.indexPlayer)
+    res.data.ships.forEach((ship) => {
+      fillBoard(ship, findedGame.player1.board);
+    });
+  }
+  if (findedGame.player2.id === res.data.indexPlayer) {
     findedGame.player2.data = res.data.ships;
+    res.data.ships.forEach((ship) => {
+      fillBoard(ship, findedGame.player2.board);
+    });
+  }
+  console.log("Added ships.");
   if (findedGame.player1.data && findedGame.player2.data) {
     const socket1 = sockets.find((s) => s.idUser === findedGame.player1.id);
     const resStartGame1: MessageApp<"start_game", DataStartGame> = {
@@ -79,6 +101,89 @@ export const handleAddShips = (
       id: 0
     };
     socket2?.ws.send(stringifyWebSocketResponse(resStartGame2));
-    console.log("Added ships.");
+
+    const defineFirstTurn =
+      Math.floor(Math.random() * 2) === 0
+        ? findedGame.player1.id
+        : findedGame.player2.id;
+    findedGame.currentPlayer = defineFirstTurn;
+    socket1?.ws.send(
+      stringifyWebSocketResponse(createTurn(findedGame.currentPlayer))
+    );
+    socket2?.ws.send(
+      stringifyWebSocketResponse(createTurn(findedGame.currentPlayer))
+    );
   }
 };
+
+export const handleAttack = (
+  res: MessageApp<
+    "attack" | "randomAttack",
+    DataAttack | Omit<DataAttack, "PositionShip">
+  >
+): void => {
+  const game = games.find((g) => g.id === res.data.gameId);
+  if (!game) return;
+  if (game.currentPlayer !== res.data.indexPlayer) return;
+  let opponent;
+  let curPlayer;
+  if (game?.player1.id === res.data.indexPlayer) {
+    opponent = game?.player2;
+    curPlayer = game?.player1;
+  } else {
+    opponent = game?.player1;
+    curPlayer = game?.player2;
+  }
+
+  let postion: PositionShip | null;
+  if (res.type === "randomAttack") getRandomPosition(curPlayer.boardOpponent);
+  switch (res.type) {
+    case "attack":
+      postion = {
+        x: res.data.y,
+        y: res.data.x
+      };
+      break;
+    case "randomAttack":
+      postion = getRandomPosition(curPlayer.boardOpponent);
+      break;
+  }
+  const shipsBoardOpponent: Board = opponent.board;
+  let hit: DataResponseAttack["status"] = "miss";
+  if (shipsBoardOpponent[postion.x][postion.y] === 1) {
+    hit = "shot";
+  }
+
+  const socket1 = sockets.find((s) => s.idUser === opponent.id);
+  const socket2 = sockets.find((s) => s.idUser === curPlayer.id);
+  if (!game.currentPlayer) return;
+  const responsePosition = { x: postion.y, y: postion.x };
+  const responseAttack = createResonseAttack({
+    position: responsePosition,
+    currentPlayer: game.currentPlayer,
+    status: hit
+  });
+  socket1?.ws.send(stringifyWebSocketResponse(responseAttack));
+  socket2?.ws.send(stringifyWebSocketResponse(responseAttack));
+  game.currentPlayer = opponent.id;
+
+  const responseTurn = createTurn(game.currentPlayer);
+  socket1?.ws.send(stringifyWebSocketResponse(responseTurn));
+  socket2?.ws.send(stringifyWebSocketResponse(responseTurn));
+};
+
+const createTurn = (
+  idPlayer: DataTurn["currentPlayer"]
+): MessageApp<"turn", DataTurn> => ({
+  type: "turn",
+  data: { currentPlayer: idPlayer },
+  id: 0
+});
+
+const createResonseAttack = (
+  obj: DataResponseAttack
+): MessageApp<"attack", DataResponseAttack> => ({
+  type: "attack",
+  data: obj,
+  id: 0
+});
